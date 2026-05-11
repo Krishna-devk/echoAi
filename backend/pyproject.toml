@@ -1,0 +1,25 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "django>=6.0.5",
+    "django-cors-headers>=4.9.0",
+    "djangorestframework>=3.17.1",
+    "djangorestframework-simplejwt>=5.5.1",
+    "groq>=1.2.0",
+    "numpy>=2.4.4",
+    "pandas>=3.0.2",
+    "pdfplumber>=0.11.9",
+    "pymysql>=1.1.1",
+    "certifi>=2024.2.2",
+    "pypdf2>=3.0.1",
+    "python-docx>=1.2.0",
+    "python-dotenv>=1.2.2",
+    "scikit-learn>=1.8.0",
+    "sentence-transformers>=5.4.1",
+    "spacy>=3.8.14",
+    "drf-spectacular>=0.28.0",
+]
