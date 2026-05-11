@@ -1,15 +1,10 @@
-import React, { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileText, CheckCircle2, X, Loader2 } from 'lucide-react';
-import { useDropzone } from 'react-dropzone'; // I need to install this
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Card } from '@/components/ui/card';
+import api from '@/lib/api';
 
 const ResumeUpload = ({ onUploadSuccess }) => {
   const [file, setFile] = useState(null);
   const [status, setStatus] = useState('idle'); // idle, uploading, success, error
   const [progress, setProgress] = useState(0);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const onDrop = useCallback((acceptedFiles) => {
     const selectedFile = acceptedFiles[0];
@@ -30,37 +25,28 @@ const ResumeUpload = ({ onUploadSuccess }) => {
 
   const handleUpload = async (file) => {
     setStatus('uploading');
-    setProgress(0);
-
-    // Simulate upload progress
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 95) {
-          clearInterval(interval);
-          return 95;
-        }
-        return prev + 5;
-      });
-    }, 100);
+    setProgress(10);
+    setErrorMsg('');
 
     try {
       const formData = new FormData();
       formData.append('file', file);
 
-      // Replace with your actual API endpoint
-      // const response = await axios.post('/api/resumes/upload/', formData);
+      const response = await api.post('/resumes/upload/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setProgress(percentCompleted);
+        },
+      });
       
-      // Simulated success
-      setTimeout(() => {
-        clearInterval(interval);
-        setProgress(100);
-        setStatus('success');
-        if (onUploadSuccess) onUploadSuccess();
-      }, 2000);
+      setStatus('success');
+      if (onUploadSuccess) onUploadSuccess(response.data);
 
     } catch (error) {
+      console.error('Upload failed:', error);
       setStatus('error');
-      clearInterval(interval);
+      setErrorMsg(error.message || 'Failed to connect to backend engine.');
     }
   };
 

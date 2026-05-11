@@ -33,6 +33,8 @@ import ResumeList from '@/components/ResumeList';
 import CandidateList from '@/components/CandidateList';
 import { Link } from 'react-router-dom';
 
+import { checkBackendHealth } from '@/lib/api';
+
 const data = [
   { name: 'Mon', score: 65 }, { name: 'Tue', score: 72 }, { name: 'Wed', score: 68 },
   { name: 'Thu', score: 85 }, { name: 'Fri', score: 92 }, { name: 'Sat', score: 88 },
@@ -42,6 +44,17 @@ const data = [
 
 const Dashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const [isOnline, setIsOnline] = useState(true);
+
+  useEffect(() => {
+    const verifyStatus = async () => {
+      const healthy = await checkBackendHealth();
+      setIsOnline(healthy);
+    };
+    verifyStatus();
+    const interval = setInterval(verifyStatus, 30000); // Check every 30s
+    return () => clearInterval(interval);
+  }, []);
   const [activeTab, setActiveTab] = useState('overview');
   const [isDark, setIsDark] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -123,6 +136,18 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            {!isOnline && (
+              <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/20 gap-1.5 px-3 py-1">
+                <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+                Backend Offline
+              </Badge>
+            )}
+            {isOnline && (
+              <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20 gap-1.5 px-3 py-1">
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+                System Online
+              </Badge>
+            )}
             <button 
               onClick={() => setIsDark(!isDark)}
               className="w-11 h-11 flex items-center justify-center rounded-xl glass hover:bg-surface-accent transition-all duration-300"
